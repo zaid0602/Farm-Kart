@@ -4,10 +4,10 @@ Farm-Kart is a marketplace for farmers where they can list their products on the
 to run the app.
 step 1: run the Frontend 
 cd frontend
->>npm start
+>npm start
 step 2: run  the Backend
 cd backend
->>node .\index.js
+>node .\index.js
 step 3: run the Admin panel
 cd admin
->>npm run dev
+>npm run dev
