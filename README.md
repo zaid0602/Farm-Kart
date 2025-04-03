@@ -1,6 +1,4 @@
 # Farm-Kart
-# Farm-Kart
-
 ## 📌 Project Description
 Farm-Kart is a marketplace for farmers where they can list their products on the website, delivering fresh farm products to the customers. This website will increase the financial profits of farmers by removing the middlemen in the mandi system and providing good quality products directly to the customers. This website is based on **MERN stack technology**. The frontend is built using **React.js**, and the backend is developed using **Express.js**.
 
