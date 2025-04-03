@@ -6,7 +6,7 @@ const AddProduct = () => {
     const [productDetails, setproductDetails] = useState({
         name:"",
         image:"",
-        category:"Grains",
+        category:"grains",
         new_price:"",
         old_price:""
         });
@@ -20,39 +20,77 @@ const AddProduct = () => {
     };
 
     const Add_Product = async ()=>{
-        console.log(productDetails);
-        let responseData;
-        let product = productDetails;
+        try {
+            if (!image) {
+                alert("Please select an image");
+                return;
+            }
 
-        let formData = new FormData();
-        formData.append('product',image);
+            if (!productDetails.name || !productDetails.category || !productDetails.new_price || !productDetails.old_price) {
+                alert("Please fill in all fields");
+                return;
+            }
 
-        await fetch('http://localhost:4000/upload',{
-            method: 'POST',
-            headers:{
-                Accept:'application/json',
-            },
-            body:formData,
-        }).then((resp) => resp.json())
-           .then((data) => {
-            responseData=data
-        });
+            console.log(productDetails);
+            let responseData;
+            let product = {...productDetails};
 
-        if(responseData.success)
-            {
+            let formData = new FormData();
+            formData.append('product',image);
+
+            const uploadResponse = await fetch('http://localhost:4000/upload',{
+                method: 'POST',
+                headers:{
+                    Accept:'application/json',
+                },
+                body:formData,
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('Failed to upload image');
+            }
+
+            responseData = await uploadResponse.json();
+
+            if(responseData.success) {
                 product.image = responseData.image_url;
+                product.new_price = Number(product.new_price);
+                product.old_price = Number(product.old_price);
                 console.log(product);
-                await fetch('http://localhost:4000/addproduct',{
+
+                const addProductResponse = await fetch('http://localhost:4000/addproduct',{
                     method:'POST',
                     headers:{
                         Accept:'application/json',
                         'Content-Type':'application/json',
                     },
                     body:JSON.stringify(product),
-                }).then((resp)=>resp.json()).then((data)=>{
-                    data.success?alert("Product Added"):alert("Failed")
-                })
+                });
+
+                if (!addProductResponse.ok) {
+                    throw new Error('Failed to add product');
+                }
+
+                const data = await addProductResponse.json();
+                if(data.success) {
+                    alert("Product Added Successfully");
+                    // Reset form
+                    setproductDetails({
+                        name:"",
+                        image:"",
+                        category:"grains",
+                        new_price:"",
+                        old_price:""
+                    });
+                    setImage(false);
+                } else {
+                    alert("Failed to add product");
+                }
             }
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Error: " + error.message);
+        }
     }
 
   return (
@@ -64,11 +102,11 @@ const AddProduct = () => {
         <div className="addproduct-price">
             <div className="addproduct-itemfield">
                 <p>Price</p>
-                <input value={productDetails.old_price} onChange={changeHandler} type="text" name='old_price' placeholder='Type Here' />
+                <input value={productDetails.old_price} onChange={changeHandler} type="number" name='old_price' placeholder='Type Here' />
             </div>
             <div className="addproduct-itemfield">
                 <p>Offer Price</p>
-                <input value={productDetails.new_price} onChange={changeHandler} type="text" name='new_price' placeholder='Type Here' />
+                <input value={productDetails.new_price} onChange={changeHandler} type="number" name='new_price' placeholder='Type Here' />
             </div>
         </div>
         <div className="addproduct-itemfield">
